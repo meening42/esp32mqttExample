@@ -1,29 +1,18 @@
-| Supported Targets | ESP32 | ESP32-C2 | ESP32-C3 | ESP32-C6 | ESP32-H2 | ESP32-S2 | ESP32-S3 |
-| ----------------- | ----- | -------- | -------- | -------- | -------- | -------- | -------- |
-
-# ESP-MQTT sample application
-(See the README.md file in the upper level 'examples' directory for more information about examples.)
-
-This example connects to the broker URI selected using `idf.py menuconfig` (using mqtt tcp transport) and as a demonstration subscribes/unsubscribes and send a message on certain topic.
-(Please note that the public broker is maintained by the community so may not be always available, for details please see this [disclaimer](https://iot.eclipse.org/getting-started/#sandboxes))
-
-Note: If the URI equals `FROM_STDIN` then the broker address is read from stdin upon application startup (used for testing)
-
-It uses ESP-MQTT library which implements mqtt client to connect to mqtt broker with MQTT version 5.
-
-The more details about MQTT v5, please refer to [official website](https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html)
+# ESP-MQTT example
 
 ## How to use example
 
-### Hardware Required
+### Hardware 
+* ESP32-C3-DevKitM-1
+* On board button
+* Using built-in temperature sensor
 
-This example can be executed on any ESP32 board, the only required interface is WiFi and connection to internet.
 
-### Configure the project
+### Configuration 
+Insert Wifi username and password here:
+CONFIG_EXAMPLE_WIFI_SSID="myssid"
+CONFIG_EXAMPLE_WIFI_PASSWORD="mypassword"
 
-* Open the project configuration menu (`idf.py menuconfig`)
-* Configure Wi-Fi or Ethernet under "Example Connection Configuration" menu. See "Establishing Wi-Fi or Ethernet Connection" section in [examples/protocols/README.md](../../README.md) for more details.
-* MQTT v5 protocol (`CONFIG_MQTT_PROTOCOL_5`) under "ESP-MQTT Configurations" menu is enabled by `sdkconfig.defaults`.
 
 ### Build and Flash
 
