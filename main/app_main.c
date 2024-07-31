@@ -87,6 +87,20 @@ static void print_user_property(mqtt5_user_property_handle_t user_property)
     }
 }
 
+ esp_mqtt_client_handle_t client;
+
+
+TimerHandle_t tmr;
+int id = 1;
+int interval = 5000;
+void ping( TimerHandle_t xTimer )
+{
+    printf("Timer!\n");
+
+ // ESP_LOGI(TAG,"tring tring!!!");
+}
+
+
 /*
  * @brief Event handler registered to receive MQTT events
  *
@@ -209,8 +223,8 @@ static void mqtt5_app_start(void)
         .broker.address.uri = CONFIG_BROKER_URL,
         .session.protocol_ver = MQTT_PROTOCOL_V_5,
         .network.disable_auto_reconnect = true,
-        .credentials.username = "123",
-        .credentials.authentication.password = "456",
+        .credentials.username = "mojca",
+        .credentials.authentication.password = "123",
         .session.last_will.topic = "/topic/will",
         .session.last_will.msg = "i will leave",
         .session.last_will.msg_len = 12,
@@ -243,7 +257,7 @@ static void mqtt5_app_start(void)
     }
 #endif /* CONFIG_BROKER_URL_FROM_STDIN */
 
-    esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt5_cfg);
+    client = esp_mqtt_client_init(&mqtt5_cfg);
 
     /* Set connection properties and user properties */
     esp_mqtt5_client_set_user_property(&connect_property.user_property, user_property_arr, USE_PROPERTY_ARR_SIZE);
@@ -259,6 +273,14 @@ static void mqtt5_app_start(void)
     /* The last argument may be used to pass data to the event handler, in this example mqtt_event_handler */
     esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt5_event_handler, NULL);
     esp_mqtt_client_start(client);
+
+    int msg_id;
+    //print_user_property(event->property->user_property);
+    esp_mqtt5_client_set_user_property(&publish_property.user_property, user_property_arr, USE_PROPERTY_ARR_SIZE);
+    esp_mqtt5_client_set_publish_property(client, &publish_property);
+    msg_id = esp_mqtt_client_publish(client, "/topic/qos1", "hej", 0, 1, 1);
+    esp_mqtt5_client_delete_user_property(publish_property.user_property);
+    publish_property.user_property = NULL;
 }
 
 void app_main(void)
@@ -286,5 +308,12 @@ void app_main(void)
      */
     ESP_ERROR_CHECK(example_connect());
 
+
+
     mqtt5_app_start();
+
+    tmr = xTimerCreate("MyTimer", pdMS_TO_TICKS(interval), pdTRUE, ( void * )id, &ping);
+    if( xTimerStart(tmr, 10 ) != pdPASS ) {
+     printf("Timer start error");
+    }
 }
