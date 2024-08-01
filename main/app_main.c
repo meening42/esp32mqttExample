@@ -174,6 +174,10 @@ static void mqtt5_event_handler(void *handler_args, esp_event_base_t base, int32
         ESP_LOGI(TAG, "sent unsubscribe successful, msg_id=%d", msg_id);
         esp_mqtt5_client_delete_user_property(unsubscribe_property.user_property);
         unsubscribe_property.user_property = NULL;
+
+            int msgID;
+    msgID  = esp_mqtt_client_subscribe(client, "tempRequest", 1);
+    printf("Subscribe return = %d\n", msgID);
         break;
     case MQTT_EVENT_DISCONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
@@ -202,6 +206,12 @@ static void mqtt5_event_handler(void *handler_args, esp_event_base_t base, int32
     case MQTT_EVENT_DATA:
         ESP_LOGI(TAG, "MQTT_EVENT_DATA");
         print_user_property(event->property->user_property);
+        printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
+        printf("DATA=%.*s\r\n", event->data_len, event->data);
+        if(strcmp (event->topic,"tempRequest") == 0){
+            triggerSrc_t trigger = TRIGGER_MQTT_REQUEST;
+            xQueueSendFromISR(evt_queue, &trigger, NULL);
+        }
         break;
     case MQTT_EVENT_ERROR:
         ESP_LOGI(TAG, "MQTT_EVENT_ERROR");
@@ -241,8 +251,8 @@ static void mqtt5_app_start(void)
         .broker.address.uri = CONFIG_BROKER_URL,
         .session.protocol_ver = MQTT_PROTOCOL_V_5,
         .network.disable_auto_reconnect = true,
-        .credentials.username = "mojca",
-        .credentials.authentication.password = "123",
+        .credentials.username = "marko",
+        .credentials.authentication.password = "12345",
         .session.last_will.topic = "/topic/will",
         .session.last_will.msg = "i will leave",
         .session.last_will.msg_len = 12,
@@ -292,7 +302,6 @@ static void mqtt5_app_start(void)
     esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt5_event_handler, NULL);
     esp_mqtt_client_start(client);
 
-    esp_mqtt_client_subscribe(client, "tempRequest", 0);
 }
 
 
